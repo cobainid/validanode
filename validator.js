@@ -1,6 +1,7 @@
-const popElement = (rule) => {
+const deleteAction = (rule) => {
     let ruleEntries = Object.entries(rule);
 
+    // get action
     let action = ruleEntries.filter(a => a[0] === 'action')[0];
     ruleEntries.splice(ruleEntries.indexOf(action), 1);
     rule = Object.fromEntries(ruleEntries);
@@ -9,7 +10,7 @@ const popElement = (rule) => {
 }
 
 
-const checkRule = (attribute, rule, data) => {
+const validateField = (attribute, rule, data) => {
     property = rule.property;
     if (rule.rule !== undefined) rule = rule.rule;
     action = rule.action;
@@ -17,7 +18,7 @@ const checkRule = (attribute, rule, data) => {
     rule.attribute = attribute;
     rule.value = data[attribute];
 
-    rule = popElement(rule);
+    rule = deleteAction(rule);
 
     if (property) {
         if (Object.entries(property).length > 0) {
@@ -31,15 +32,35 @@ const checkRule = (attribute, rule, data) => {
         }
     }
 
-
     return action(rule);
 }
+
+const actionValidate = (resolve, err, attribute, rule, data) => {
+    let is_error = validateField(attribute, rule, data);
+    if (is_error) {
+        if (err[attribute] == undefined) err[attribute] = [];
+        err[attribute].push(is_error);
+        resolve(err);
+    }
+}
+
+const isArray = (element) => {
+    if (element.length !== undefined && typeof element === 'object') {
+        return true;
+    }
+    return false;
+}
+
+
 
 const validator = (fields, data, messages = null) => {
     return new Promise(async (resolve) => {
         let err = {};
 
-        if( fields.length === undefined && typeof fields === 'object'){
+        // let hasMessage = (messages == null) ? false : true;
+
+        // check jika object tidak berupa array
+        if (fields.length === undefined && typeof fields === 'object') {
             fields = [fields];
         }
 
@@ -48,50 +69,29 @@ const validator = (fields, data, messages = null) => {
             let attributes = field.attribute;
             let rules = field.rules;
 
-            if (attributes.length && typeof (attributes) == 'object') {
+            if (isArray(attributes)) {
                 // banyak attribute
                 attributes.forEach((attribute) => {
-                    if (rules.length && typeof (rules) == 'object') {
+                    if (isArray(rules)) {
                         // banyak rules
                         rules.forEach((rule) => {
-                            let is_error = checkRule(attribute, rule, data);
-                            if (is_error) {
-                                if (err[attribute] == undefined) err[attribute] = [];
-                                err[attribute].push(is_error);
-                                resolve(err);
-                            }
+                            actionValidate(resolve, err, attribute, rule, data);
                         });
                     } else {
                         // satu rules
-                        let is_error = checkRule(attribute, rules, data);
-                        if (is_error) {
-                            if (err[attribute] == undefined) err[attribute] = [];
-                            err[attribute].push(is_error);
-                            resolve(err);
-                        }
+                        actionValidate(resolve, err, attribute, rules, data);
                     }
                 });
             } else {
                 // satu attribute
-                if (rules.length && typeof (rules) == 'object') {
+                if (isArray(rules)) {
                     // banyak rules
                     rules.forEach((rule) => {
-                        let is_error = checkRule(attributes, rule, data);
-                        if (is_error) {
-                            if (err[attributes] == undefined) err[attributes] = [];
-                            err[attributes].push(is_error);
-                            resolve(err);
-                        }
+                        actionValidate(resolve, err, attributes, rule, data);
                     })
                 } else {
                     // satu rules
-                    let is_error = checkRule(attributes, rules, data);
-
-                    if (is_error) {
-                        if (err[attributes] == undefined) err[attributes] = [];
-                        err[attributes].push(is_error);
-                        resolve(err);
-                    }
+                    actionValidate(resolve, err, attributes, rules, data);
                 }
             }
         });
