@@ -39,8 +39,11 @@ const validator = (fields, data, messages = null) => {
     return new Promise(async (resolve) => {
         let err = {};
 
+        if( fields.length === undefined && typeof fields === 'object'){
+            fields = [fields];
+        }
+
         fields.forEach((field) => {
-            let err = {};
 
             let attributes = field.attribute;
             let rules = field.rules;
