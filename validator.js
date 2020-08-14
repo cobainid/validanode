@@ -1,13 +1,8 @@
-const deleteAction = (rule) => {
-    let ruleEntries = Object.entries(rule);
-
-    // get action
-    let action = ruleEntries.filter(a => a[0] === 'action')[0];
-    ruleEntries.splice(ruleEntries.indexOf(action), 1);
-    rule = Object.fromEntries(ruleEntries);
-
-    return rule;
-}
+const {
+    deleteElement,
+    isArray,
+    toArray
+} = require("./core");
 
 
 const validateField = (attribute, rule, data) => {
@@ -18,12 +13,14 @@ const validateField = (attribute, rule, data) => {
     rule.attribute = attribute;
     rule.value = data[attribute];
 
-    rule = deleteAction(rule);
+    rule = deleteElement(rule, 'action');
 
     if (property) {
-        if (Object.entries(property).length > 0) {
+        property_as_array = toArray(property);
+        if (property_as_array.length > 0) {
             let hasTargetAttribute = false;
-            Object.entries(property).forEach((element) => {
+
+            property_as_array.forEach((element) => {
                 if (element[0] === 'targetAttribute') hasTargetAttribute = true;
                 rule.property[element[0]] = element[1];
             });
@@ -35,6 +32,7 @@ const validateField = (attribute, rule, data) => {
     return action(rule);
 }
 
+
 const actionValidate = (resolve, err, attribute, rule, data) => {
     let is_error = validateField(attribute, rule, data);
     if (is_error) {
@@ -43,14 +41,6 @@ const actionValidate = (resolve, err, attribute, rule, data) => {
         resolve(err);
     }
 }
-
-const isArray = (element) => {
-    if (element.length !== undefined && typeof element === 'object') {
-        return true;
-    }
-    return false;
-}
-
 
 
 const validator = (fields, data, messages = null) => {
@@ -96,12 +86,6 @@ const validator = (fields, data, messages = null) => {
             }
         });
     })
-}
-
-const checkTypeValidator = (TYPE) => {
-    // console.log(typeof isRuleExist);
-    // if (isRuleExist(TYPE)) return TYPE_VALIDATOR[TYPE];
-    return "TYPE doesnt exist";
 }
 
 module.exports = validator

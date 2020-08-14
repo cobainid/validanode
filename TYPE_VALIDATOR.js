@@ -1,56 +1,38 @@
-const popMessage = (property) => {
-    properties = Object.entries(property);
-    let message = properties.filter(a => a[0] === 'message')[0];
-    properties.splice(properties.indexOf(message), 1);
-    properties = Object.fromEntries(properties);
-    property = properties;
+const {
+    toArray,
+    deleteElement
+} = require("./core")
 
-    return property;
-}
-const popValue = (rule) => {
-    rule_array = Object.entries(rule);
-    let value = rule_array.filter(a => a[0] === 'value')[0];
-    rule_array.splice(rule_array.indexOf(value), 1);
-    rule_array = Object.fromEntries(rule_array);
-    rule = rule_array;
-
-    return rule;
-}
-
-
-const setMessage = (rule) => {
-    message = rule.property.message;
-    rule = popValue(rule);
-    rule.property = popMessage(rule.property);
+const setMessage = (rules) => {
+    message = rules.property.message;
+    rules = deleteElement(rules, "value");
+    rules.property = deleteElement(rules.property, "message");
 
     list = {};
-    arrayList = Object.entries(rule);
 
-    arrayList.forEach((element) => {
-        if (element[0] == 'property') {
-            arrayList2 = Object.entries(element[1]);
-            arrayList2.forEach((element2) => {
-                list['property.' + element2[0]] = element2[1];
+    rules_as_array = toArray(rules);
+
+    rules_as_array.forEach((rule) => {
+        if (rule[0] == 'property') {
+            rule_as_array = toArray(rule[1]);
+
+            rule_as_array.forEach((data) => {
+                list['property.' + data[0]] = data[1];
             });
         } else {
             list[element[0]] = element[1];
         }
     });
 
-    arrayList = Object.entries(list);
+    arrayList = toArray(list);
+
     arrayList.forEach((element) => {
         message = message.replace(`{${element[0]}}`, element[1]);
     });
 
     return message;
 }
-const isRuleExist = (RULE_NAME) => {
-    let rule = TYPE_VALIDATOR[RULE_NAME];
-    if (rule) {
-        return rule;
-    }
-    return false;
-}
+
 
 const TYPE_VALIDATOR = {
     NUMBER: {
