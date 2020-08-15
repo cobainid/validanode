@@ -25,10 +25,39 @@ const isArray = (element) => {
     return false;
 }
 
+// generate invalid message
+const invalidMessage = (rules) => {
+    message = rules.property.message;
+    rules = deleteElement(rules, "value");
+    rules.property = deleteElement(rules.property, "message");
+
+    list_data = {};
+
+    rules_as_array = toArray(rules);
+
+    rules_as_array.forEach(rule => {
+        if (rule[0] == 'property') {
+            rule_as_array = toArray(rule[1]);
+
+            rule_as_array.forEach((data) => {
+                list_data['property.' + data[0]] = data[1];
+            });
+        } else {
+            list_data[rule[0]] = rule[1];
+        }
+    });
+
+    toArray(list_data).forEach(data => {
+        message = message.replace(`{${data[0]}}`, data[1]);
+    });
+
+    return message;
+}
 
 module.exports = {
     toArray,
     toObjectList,
     deleteElement,
-    isArray
+    isArray,
+    invalidMessage
 };

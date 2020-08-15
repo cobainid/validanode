@@ -1,36 +1,8 @@
 const {
     toArray,
-    deleteElement
+    deleteElement,
+    invalidMessage,
 } = require("./core")
-
-const setMessage = (rules) => {
-    message = rules.property.message;
-    rules = deleteElement(rules, "value");
-    rules.property = deleteElement(rules.property, "message");
-
-    list_data = {};
-
-    rules_as_array = toArray(rules);
-
-    rules_as_array.forEach( rule => {
-        if (rule[0] == 'property') {
-            rule_as_array = toArray(rule[1]);
-
-            rule_as_array.forEach((data) => {
-                list_data['property.' + data[0]] = data[1];
-            });
-        } else {
-            list_data[rule[0]] = rule[1];
-        }
-    });
-
-    toArray(list_data).forEach( data => {
-        message = message.replace(`{${data[0]}}`, data[1]);
-    });
-
-    return message;
-}
-
 
 const TYPE_VALIDATOR = {
     NUMBER: {
@@ -43,7 +15,7 @@ const TYPE_VALIDATOR = {
             if (typeof (data.value) == 'number') {
                 return;
             } else {
-                return setMessage(data);
+                return invalidMessage(data);
             }
         }
     },
@@ -57,7 +29,7 @@ const TYPE_VALIDATOR = {
             if (typeof (data.value) == 'string') {
                 return;
             } else {
-                return setMessage(data);
+                return invalidMessage(data);
             }
         }
     },
@@ -71,7 +43,7 @@ const TYPE_VALIDATOR = {
             if (typeof (data.value) == 'boolean') {
                 return;
             } else {
-                return setMessage(data);
+                return invalidMessage(data);
             }
         }
     },
@@ -85,7 +57,7 @@ const TYPE_VALIDATOR = {
             if (typeof data.value === 'object') {
                 return;
             }
-            return setMessage(data);
+            return invalidMessage(data);
         }
     },
     ARRAY: {
@@ -99,7 +71,7 @@ const TYPE_VALIDATOR = {
                 hasLength = data.value.length;
                 if (hasLength !== undefined) return;
             }
-            return setMessage(data);
+            return invalidMessage(data);
         }
     },
     REQUIRED: {
@@ -110,7 +82,7 @@ const TYPE_VALIDATOR = {
         },
         action: (data) => {
             if (data.value === undefined || data.value === null) {
-                return setMessage(data);
+                return invalidMessage(data);
             }
             return;
         }
@@ -127,9 +99,9 @@ const TYPE_VALIDATOR = {
                 if (value[0] == data.property.value) {
                     return;
                 }
-                return setMessage(data);
+                return invalidMessage(data);
             } catch (e) {
-                return setMessage(data);
+                return invalidMessage(data);
             }
         }
     },
@@ -145,7 +117,7 @@ const TYPE_VALIDATOR = {
             if (data.value === data.property.targetAttributeValue) {
                 return;
             }
-            return setMessage(data);
+            return invalidMessage(data);
         }
     },
     GREATER_THAN: {
@@ -161,10 +133,10 @@ const TYPE_VALIDATOR = {
                 if (data.value > data.property.targetAttributeValue) {
                     return;
                 }
-                return setMessage(data);
+                return invalidMessage(data);
             }
             data.property.message = 'The {attribute} and {property.targetAttribute} must a number!';
-            return setMessage(data);
+            return invalidMessage(data);
         }
     },
 };
