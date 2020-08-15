@@ -7,7 +7,18 @@ const {
     NUMBER
 } = require('./TYPE_VALIDATOR.js');
 
-const validator = require('./validator.js');
+const validanode = require('./validator.js');
+
+const validator = new validanode();
+
+const messages = {
+    REQUIRED: 'Kolom {attribute} tidak boleh kosong!',
+    STRING: 'Kolom {attribute} harus berupa string!',
+    NUMBER: 'Kolom {attribute} harus berupa angka!',
+    EQUAL_WITH: 'Kolom {attribute} harus sama dengan {targetAttribute}!',
+};
+
+// validator.set('message', messages);
 
 const main = async () => {
     data = {
@@ -16,13 +27,6 @@ const main = async () => {
         re_password: 17,
         numb_1: 12,
         numb_2: 22,
-    };
-
-    messages = {
-        REQUIRED: 'Kolom {attribute} tidak boleh kosong!',
-        STRING: 'Kolom {attribute} harus berupa string!',
-        NUMBER: 'Kolom {attribute} harus berupa angka!',
-        EQUAL_WITH: 'Kolom {attribute} harus sama dengan {targetAttribute}!',
     };
 
     fields = [{
@@ -61,8 +65,8 @@ const main = async () => {
         }
     ];
 
-    err = await validator(fields, data, messages);
-    return err;
+    err = await validator.validator(fields, data);
+    if(err) return err;
 }
 
 (function () {
