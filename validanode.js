@@ -43,6 +43,11 @@ class validanode {
             let rule = this.getTypeValidator(key); // mendapatkan rule
 
             rule.property.message = newCustomMessage;
+
+            if(rule.name !== undefined){
+                rule = asObject([[rule.name, rule]]);
+            }
+
             this.TYPE_VALIDATOR = Object.assign({}, this.TYPE_VALIDATOR, rule);
         });
     }
