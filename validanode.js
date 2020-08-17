@@ -3,6 +3,7 @@ const {
     isArray,
     isObject,
     asArray,
+    asObject,
 } = require("./lib/core");
 
 class validanode {
@@ -12,8 +13,25 @@ class validanode {
         this.TYPE_VALIDATOR = require('./TYPE_VALIDATOR');
     }
 
-    add(custom_validation){
-        this.TYPE_VALIDATOR = Object.assign({}, custom_validation, this.TYPE_VALIDATOR);
+    add(custom_validation) {
+        let keys = Object.keys(custom_validation);
+        let rules = {};
+        if (keys.length < 2) keys = keys[0];
+
+        if (typeof keys === "string") {
+            rules = this.getTypeValidator(keys);
+            if (rules === undefined) {
+                this.TYPE_VALIDATOR = Object.assign({}, this.TYPE_VALIDATOR, custom_validation);
+            } else {
+                rules = Object.assign({}, rules, custom_validation[keys]);
+                // build as schema
+                rules = asObject([
+                    [keys, rules]
+                ]);
+                this.TYPE_VALIDATOR = Object.assign({}, this.TYPE_VALIDATOR, rules);
+            }
+        }
+
     }
 
     getTypeValidator(type_name) {
@@ -30,7 +48,7 @@ class validanode {
             });
             return data;
         } catch (e) {
-            throw new e;
+            throw (e);
         }
     }
 
@@ -44,8 +62,10 @@ class validanode {
 
             rule.property.message = newCustomMessage;
 
-            if(rule.name !== undefined){
-                rule = asObject([[rule.name, rule]]);
+            if (rule.name !== undefined) {
+                rule = asObject([
+                    [rule.name, rule]
+                ]);
             }
 
             this.TYPE_VALIDATOR = Object.assign({}, this.TYPE_VALIDATOR, rule);
@@ -54,7 +74,7 @@ class validanode {
 
 
     validateField(attribute, rule, data) {
-        if(rule === undefined){
+        if (rule === undefined) {
             throw new "TYPE VALIDATOR NOT FOUND !!";
         }
         let property = rule.property;
@@ -108,7 +128,7 @@ class validanode {
                 let attributes = field.attribute;
                 let rules = field.rules;
 
-                if(rules === undefined){
+                if (rules === undefined) {
                     throw new "TYPE VALIDATOR NOT FOUND !!";
                 }
 
