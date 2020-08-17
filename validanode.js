@@ -6,11 +6,14 @@ const {
 } = require("./lib/core");
 
 class validanode {
-    CUSTOM_MESSAGE = {};
     TYPE_VALIDATOR = {};
 
     constructor() {
         this.TYPE_VALIDATOR = require('./TYPE_VALIDATOR');
+    }
+
+    add(custom_validation){
+        this.TYPE_VALIDATOR = Object.assign({}, custom_validation, this.TYPE_VALIDATOR);
     }
 
     getTypeValidator(type_name) {
@@ -46,6 +49,9 @@ class validanode {
 
 
     validateField(attribute, rule, data) {
+        if(rule === undefined){
+            throw new "TYPE VALIDATOR NOT FOUND !!";
+        }
         let property = rule.property;
         if (rule.rule !== undefined) rule = rule.rule;
         let action = rule.action;
@@ -96,6 +102,10 @@ class validanode {
 
                 let attributes = field.attribute;
                 let rules = field.rules;
+
+                if(rules === undefined){
+                    throw new "TYPE VALIDATOR NOT FOUND !!";
+                }
 
                 if (isArray(attributes)) {
                     // banyak attributes
