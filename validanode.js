@@ -1,10 +1,50 @@
 const {
     deleteElement,
     isArray,
-    toArray
-} = require("./core");
+    isObject,
+    asArray,
+} = require("./lib/core");
 
 class validanode {
+    CUSTOM_MESSAGE = {};
+    TYPE_VALIDATOR = {};
+
+    constructor() {
+        this.TYPE_VALIDATOR = require('./TYPE_VALIDATOR');
+    }
+
+    getTypeValidator(type_name) {
+        try {
+            type_name = type_name.toUpperCase().split('.');
+
+            let data = undefined;
+            type_name.forEach(index => {
+                if (data == undefined) {
+                    data = this.TYPE_VALIDATOR[index];
+                } else {
+                    data = data[index];
+                }
+            });
+            return data;
+        } catch (e) {
+            throw new e;
+        }
+    }
+
+    setCustomMessage(custom_messages) {
+
+        asArray(custom_messages).forEach((msg) => {
+            let key = msg[0];
+            let newCustomMessage = msg[1];
+
+            let rule = this.getTypeValidator(key); // mendapatkan rule
+
+            rule.property.message = newCustomMessage;
+            this.TYPE_VALIDATOR = Object.assign({}, this.TYPE_VALIDATOR, rule);
+        });
+    }
+
+
     validateField(attribute, rule, data) {
         let property = rule.property;
         if (rule.rule !== undefined) rule = rule.rule;
@@ -16,16 +56,16 @@ class validanode {
         rule = deleteElement(rule, 'action');
 
         if (property) {
-            let property_as_array = toArray(property);
+            let property_as_array = asArray(property);
             if (property_as_array.length > 0) {
-                let hasTargetAttribute = false;
+                let has_target_attribute = false;
 
                 property_as_array.forEach((element) => {
-                    if (element[0] === 'targetAttribute') hasTargetAttribute = true;
+                    if (element[0] === 'targetAttribute') has_target_attribute = true;
                     rule.property[element[0]] = element[1];
                 });
 
-                if (hasTargetAttribute) rule.property['targetAttributeValue'] = data[property.targetAttribute];
+                if (has_target_attribute) rule.property['targetAttributeValue'] = data[property.targetAttribute];
             }
         }
 
@@ -43,12 +83,12 @@ class validanode {
     }
 
 
-    validator(fields, data) {
+    check(fields, data) {
         return new Promise(async (resolve) => {
             let err = {};
 
             // check jika object tidak berupa array
-            if (fields.length === undefined && typeof fields === 'object') {
+            if (isObject(fields)) {
                 fields = [fields];
             }
 
@@ -58,7 +98,7 @@ class validanode {
                 let rules = field.rules;
 
                 if (isArray(attributes)) {
-                    // banyak attribute
+                    // banyak attributes
                     attributes.forEach((attribute) => {
                         if (isArray(rules)) {
                             // banyak rules
@@ -66,7 +106,7 @@ class validanode {
                                 this.actionValidate(resolve, err, attribute, rule, data);
                             });
                         } else {
-                            // satu rules
+                            // satu rule
                             this.actionValidate(resolve, err, attribute, rules, data);
                         }
                     });
@@ -78,7 +118,7 @@ class validanode {
                             this.actionValidate(resolve, err, attributes, rule, data);
                         })
                     } else {
-                        // satu rules
+                        // satu rule
                         this.actionValidate(resolve, err, attributes, rules, data);
                     }
                 }

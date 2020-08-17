@@ -1,8 +1,4 @@
-const {
-    toArray,
-    deleteElement,
-    invalidMessage,
-} = require("./core")
+const { invalidMessage } = require("./lib/core")
 
 const TYPE_VALIDATOR = {
     NUMBER: {
@@ -121,22 +117,24 @@ const TYPE_VALIDATOR = {
         }
     },
     GREATER_THAN: {
-        name: 'GREATER_THAN',
-        attribute: '',
-        property: {
-            targetAttribute: '',
-            targetAttributeValue: '',
-            message: 'The {attribute} must greather than {property.targetAttribute}',
-        },
-        action: (data) => {
-            if (typeof data.value === 'number' && typeof data.property.targetAttributeValue === 'number') {
-                if (data.value > data.property.targetAttributeValue) {
-                    return;
+        ATTRIBUTE : {
+            name: 'GREATER_THAN.ATTRIBUTE',
+            attribute: '',
+            property: {
+                targetAttribute: '',
+                targetAttributeValue: '',
+                message: 'The {attribute} must greather than {property.targetAttribute}',
+            },
+            action: (data) => {
+                if (typeof data.value === 'number' && typeof data.property.targetAttributeValue === 'number') {
+                    if (data.value > data.property.targetAttributeValue) {
+                        return;
+                    }
+                    return invalidMessage(data);
                 }
+                data.property.message = 'The {attribute} and {property.targetAttribute} must a number!';
                 return invalidMessage(data);
             }
-            data.property.message = 'The {attribute} and {property.targetAttribute} must a number!';
-            return invalidMessage(data);
         }
     },
 };
