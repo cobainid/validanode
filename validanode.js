@@ -52,7 +52,7 @@ class validanode {
         }
     }
 
-    setCustomMessage(custom_messages) {
+    localization(custom_messages) {
 
         asArray(custom_messages).forEach((msg) => {
             let key = msg[0];
@@ -74,9 +74,6 @@ class validanode {
 
 
     validateField(attribute, rule, data) {
-        if (rule === undefined) {
-            throw new "TYPE VALIDATOR NOT FOUND !!";
-        }
         let property = rule.property;
         if (rule.rule !== undefined) rule = rule.rule;
         let action = rule.action;
@@ -113,6 +110,31 @@ class validanode {
         }
     }
 
+    checkRule(rules) {
+        let rule_count = rules.length;
+
+        for (let i = 0; i < rule_count; i++) {
+            if (typeof rules[i] === "string") {
+                let temp_rule = this.getTypeValidator(rules[i]);
+                if (temp_rule) {
+                    rules[i] = temp_rule;
+                } else {
+                    throw (`TYPE VALIDATOR "${rules[i]} NOT FOUND !!!"`);
+                }
+            }
+            if (typeof rules[i].rule === "string") {
+                let temp_rule = this.getTypeValidator(rules[i].rule);
+                if (temp_rule) {
+                    rules[i].rule = temp_rule;
+                } else {
+                    throw (`TYPE VALIDATOR "${rules[i].rule} NOT FOUND !!!"`);
+                }
+            }
+        }
+
+        return rules;
+    }
+
 
     check(fields, data) {
         return new Promise(async (resolve) => {
@@ -128,34 +150,22 @@ class validanode {
                 let attributes = field.attribute;
                 let rules = field.rules;
 
-                if (rules === undefined) {
-                    throw new "TYPE VALIDATOR NOT FOUND !!";
+                // mengubah type data menjadi array
+                if (!isArray(attributes)) {
+                    attributes = [attributes];
+                }
+                if (!isArray(rules)) {
+                    rules = [rules];
                 }
 
+                rules = this.checkRule(rules); // exist or not
+
                 if (isArray(attributes)) {
-                    // banyak attributes
                     attributes.forEach((attribute) => {
-                        if (isArray(rules)) {
-                            // banyak rules
-                            rules.forEach((rule) => {
-                                this.actionValidate(resolve, err, attribute, rule, data);
-                            });
-                        } else {
-                            // satu rule
-                            this.actionValidate(resolve, err, attribute, rules, data);
-                        }
-                    });
-                } else {
-                    // satu attribute
-                    if (isArray(rules)) {
-                        // banyak rules
                         rules.forEach((rule) => {
-                            this.actionValidate(resolve, err, attributes, rule, data);
-                        })
-                    } else {
-                        // satu rule
-                        this.actionValidate(resolve, err, attributes, rules, data);
-                    }
+                            this.actionValidate(resolve, err, attribute, rule, data);
+                        });
+                    });
                 }
             });
         })
