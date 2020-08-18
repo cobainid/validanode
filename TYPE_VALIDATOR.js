@@ -87,6 +87,7 @@ const TYPE_VALIDATOR = {
         name: 'START_WITH',
         attribute: '',
         property: {
+            value: "",
             message: `The {attribute} must started with "{property.value}"`,
         },
         action: (data) => {
@@ -106,7 +107,6 @@ const TYPE_VALIDATOR = {
         attribute: '',
         property: {
             targetAttribute: '',
-            targetAttributeValue: '',
             message: 'The {attribute} must equal with {property.targetAttribute}',
         },
         action: (data) => {
@@ -126,14 +126,16 @@ const TYPE_VALIDATOR = {
                 message: 'The {attribute} must greather than {property.targetAttribute}',
             },
             action: (data) => {
-                if (typeof data.value === 'number' && typeof data.property.targetAttributeValue === 'number') {
-                    if (data.value > data.property.targetAttributeValue) {
-                        return;
+                try {
+                    if (typeof data.value === 'number' && typeof data.property.targetAttributeValue === 'number') {
+                        if (data.value > data.property.targetAttributeValue) {
+                            return;
+                        }
                     }
                     return invalidMessage(data);
+                } catch (error) {
+                    return invalidMessage(error);
                 }
-                data.property.message = 'The {attribute} and {property.targetAttribute} must a number!';
-                return invalidMessage(data);
             }
         }
     },
