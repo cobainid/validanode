@@ -3,6 +3,12 @@
 ## Description
 VALIDANODE adalah sebuah validator yang dibuat dengan Javascript.
 
+## Installation
+
+```bash
+npm install validanode
+```
+
 
 ## How To Use
 
