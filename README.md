@@ -63,14 +63,10 @@ const { REQUIRED } = validator.TYPE_VALIDATOR;
         attribute: ['name', 'age'],
         rules: [{
             rule: REQUIRED,
-            property: {
-                message: "Kolom '{attribute}' tidak boleh kosong."
-            }
+            'property.message': "Kolom '{attribute}' tidak boleh kosong."
         }, {
             rule: "STRING",
-            property: {
-                message: "Kolom '{attribute}' harus berupa string."
-            }
+            'property.message': "Kolom '{attribute}' harus berupa string."
         }],
     };
 
@@ -216,17 +212,15 @@ validator.localization(MESSAGES);
     };
 
     let fields = [{
-            attribute: ['field_1', 'field_2'],
-            rules: ['required', 'number']
-        }, {
-            attribute: 'field_1',
-            rules: {
-                rule: 'greater_than.attribute',
-                property: {
-                    targetAttribute: 'field_2'
-                }
-            }
-        }]
+        attribute: ['field_1', 'field_2'],
+        rules: ['required', 'number']
+    }, {
+        attribute: 'field_1',
+        rules: {
+            rule: 'greater_than.attribute',
+            'property.targetAttribute': 'field_2'
+        }
+    }]
 
     let err = await validator.check(fields, data);
 

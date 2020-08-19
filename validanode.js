@@ -7,6 +7,7 @@ const {
 } = require("./lib/core");
 
 class validanode {
+
     TYPE_VALIDATOR = {};
 
     constructor() {
@@ -75,8 +76,22 @@ class validanode {
 
     validateField(attribute, rule, data) {
         let property = rule.property;
+        asArray(rule).forEach( data => {
+            let key = data[0].split(".");
+            if(key.length > 1 && key[0] === "property"){
+                key.shift();
+                
+                let value = data[1];
+                let object = asObject([
+                    [key[0], value]
+                ]);
+
+                property = Object.assign({}, property, object);
+            }
+        })
         if (rule.rule !== undefined) rule = rule.rule;
         let action = rule.action;
+
 
         rule.attribute = attribute;
         rule.value = data[attribute];

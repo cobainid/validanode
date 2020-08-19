@@ -1,0 +1,25 @@
+{
+  "name": "validanode",
+  "version": "1.0.0",
+  "description": "VALIDANODE adalah sebuah validator yang dibuat dengan Javascript.",
+  "main": "validanode.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/defrindr/validanode.git"
+  },
+  "keywords": [
+    "validator",
+    "nodejs",
+    "javascript"
+  ],
+  "author": "Defri Indra Mahardika",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/defrindr/validator/issues"
+  },
+  "homepage": "https://github.com/defrindr/validator#readme"
+}
