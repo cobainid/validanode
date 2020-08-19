@@ -9,13 +9,12 @@ VALIDANODE adalah sebuah validator yang dibuat dengan Javascript.
 npm install validanode
 ```
 
-
 ## How To Use
 
 ### Simple Usage
 
 ```javascript
-const validanode = require('./validanode.js');
+const validanode = require('validanode');
 
 const validator = new validanode;
 
@@ -53,7 +52,7 @@ const {
 ### Change Error Message
 
 ```javascript
-const validanode = require('./validanode.js');
+const validanode = require('validanode');
 
 const validator = new validanode;
 
@@ -97,7 +96,7 @@ const { REQUIRED } = validator.TYPE_VALIDATOR;
 ### Get Type Validator Schema
 
 ```javascript
-const validanode = require('./validanode.js');
+const validanode = require('validanode');
 
 const validator = new validanode;
 
@@ -143,7 +142,7 @@ const {
 ### Add Custom Validator
 
 ```javascript
-const validanode = require('./validanode.js');
+const validanode = require('validanode');
 const {
     invalidMessage
 } = require("./lib/core");
@@ -198,7 +197,7 @@ validator.add(CUSTOM_VALIDATION);
 ### Localization
 
 ```javascript
-const validanode = require('./validanode.js');
+const validanode = require('validanode');
 
 const MESSAGES = {
     'number': 'Kolom {attribute} harus berupa number!',
