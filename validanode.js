@@ -1,5 +1,6 @@
 const {
     deleteElement,
+    dropSpecificArray,
     isArray,
     isObject,
     asArray,
@@ -35,14 +36,46 @@ class validanode {
 
     }
 
-    getAllTypeValidator(){
+    removeBlacklistKey(source) {
+        let blacklisted = ['name', 'attribute', 'property', 'action'];
+
+        blacklisted.forEach(blacklist_value => {
+            let element = source.filter(value => value === blacklist_value)[0];
+            if (element) {
+                source.splice(source.indexOf(element), 1);
+            }
+        });
+
+        return source;
+    }
+    nestedGetValidator(key_list, data, resolve,  prefix = "") {
+        let value_key_list = Object.keys(data[1]);
+        let key_name = "";
+        if (prefix.length) {
+            key_name = prefix + "." + data[0];
+        }else{
+            key_name = data[0];
+        }
+
+        // removed blacklisted key
+        this.removeBlacklistKey(value_key_list);
+
+        if (value_key_list.length > 0) {
+            asArray(data[1]).forEach(nested_data => {
+                this.nestedGetValidator(key_list, nested_data, resolve, key_name);
+            });
+        } else {
+            key_list.push(key_name);
+            Promise.resolve(key_list).then(resolve)
+        }
+    }
+
+    getAllTypeValidator() {
         return new Promise((resolve) => {
-            let key = 0;
             let key_list = [];
 
-            asArray(this.TYPE_VALIDATOR).forEach(value => {
-                key_list.push(value[key]);
-                Promise.resolve(key_list).then(resolve)
+            asArray(this.TYPE_VALIDATOR).forEach(data => {
+                this.nestedGetValidator(key_list, data, resolve, "");
             });
         });
     }
@@ -88,11 +121,11 @@ class validanode {
 
     validateField(attribute, rule, data) {
         let property = rule.property;
-        asArray(rule).forEach( data => {
+        asArray(rule).forEach(data => {
             let key = data[0].split(".");
-            if(key.length > 1 && key[0] === "property"){
+            if (key.length > 1 && key[0] === "property") {
                 key.shift();
-                
+
                 let value = data[1];
                 let object = asObject([
                     [key[0], value]
