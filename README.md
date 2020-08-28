@@ -49,6 +49,40 @@ const {
 // }
 ```
 
+
+
+
+### Get All Type Validator
+
+```javascript
+
+const validanode = require('./validanode.js');
+const customValidation = require('./my-custom-validation/custom');
+const anotherCustomValidation = require('./my-custom-validation/another-custom');
+
+const validator = new validanode();
+
+validator.add(customValidation);
+validator.add(anotherCustomValidation);
+
+(async function () {
+    validator
+        .getAllTypeValidator()
+        .then(result => console.log(result));
+})();
+
+// OUTPUT : 
+// [
+//     'NUMBER', 'STRING',
+//     'BOOLEAN', 'OBJECT',
+//     'ARRAY', 'REQUIRED',
+//     'START_WITH', 'EQUAL_WITH',
+//     'GREATER_THAN', 'EMAIL'
+// ]
+
+```
+
+
 ### Change Error Message
 
 ```javascript

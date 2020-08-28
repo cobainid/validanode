@@ -35,6 +35,18 @@ class validanode {
 
     }
 
+    getAllTypeValidator(){
+        return new Promise((resolve) => {
+            let key = 0;
+            let key_list = [];
+
+            asArray(this.TYPE_VALIDATOR).forEach(value => {
+                key_list.push(value[key]);
+                Promise.resolve(key_list).then(resolve)
+            });
+        });
+    }
+
     getTypeValidator(type_name) {
         try {
             type_name = type_name.toUpperCase().split('.');
