@@ -3,6 +3,7 @@
   "version": "1.0.3",
   "description": "VALIDANODE adalah sebuah validator yang dibuat dengan Javascript.",
   "main": "validanode.js",
+  "module": "validanode.js",
   "directories": {
     "lib": "lib"
   },

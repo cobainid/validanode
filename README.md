@@ -1,6 +1,23 @@
 # VALIDANODE
 
+
+## Table of Content
+
+- [VALIDANODE](#validanode)
+    - [Table of Content](#table-of-content)
+    - [Description](#description)
+    - [Installation](#installation)
+    - [How To Use](#how-to-use)
+        - [Simple Usage](#simple-usage)
+        - [Get All Validator](#get-all-validator)
+        - [Change Error Message](#change-error-message)
+        - [Get Validator Schema](#get-validator-schema)
+        - [Add Custom Validator](#add-custom-validator)
+        - [Localization](#localization)
+
+
 ## Description
+
 VALIDANODE adalah sebuah validator yang dibuat dengan Javascript.
 
 ## Installation
@@ -15,51 +32,36 @@ npm install validanode
 
 ```javascript
 const validanode = require('validanode');
-
 const validator = new validanode;
-
-const {
-    REQUIRED,
-    STRING
-} = validator.TYPE_VALIDATOR;
 
 (async function () {
     let data = {
         name: "Defri Indra Mahardika",
         age: 17,
     };
-
     let field = {
         attribute: ['name', 'age'],
-        rules: [REQUIRED, STRING],
-        // rules: ["REQUIRED", "STRING"],
+        rules: ['required', 'string'],
     };
-
     err = await validator.check(field, data);
 
-    if (err) {
-        console.log(err);
-    }
-
+    if (err) console.log(err);
 })();
+```
 
-// OUTPUT :
-// {
-//     age: ['The age must a string!']
-// }
+OUTPUT :
+
+```javascript
+{ age: [ 'The age must a string!' ] }
 ```
 
 
-
-
-### Get All Type Validator
+### Get All Validator
 
 ```javascript
-
-const validanode = require('./validanode.js');
-const customValidation = require('./my-custom-validation/custom');
-const anotherCustomValidation = require('./my-custom-validation/another-custom');
-
+const validanode = require('validanode');
+const customValidation = require('validanode/my-custom-validation/custom');
+const anotherCustomValidation = require('validanode/my-custom-validation/another-custom');
 const validator = new validanode();
 
 validator.add(customValidation);
@@ -67,19 +69,27 @@ validator.add(anotherCustomValidation);
 
 (async function () {
     validator
-        .getAllTypeValidator()
+        .getValidators()
         .then(result => console.log(result));
 })();
+```
 
-// OUTPUT : 
-// [
-//     'NUMBER', 'STRING',
-//     'BOOLEAN', 'OBJECT',
-//     'ARRAY', 'REQUIRED',
-//     'START_WITH', 'EQUAL_WITH',
-//     'GREATER_THAN', 'EMAIL'
-// ]
+OUTPUT :
 
+```javascript
+[
+  'NUMBER',
+  'STRING',
+  'BOOLEAN',
+  'OBJECT',
+  'ARRAY',
+  'REQUIRED',
+  'START_WITH',
+  'EQUAL_WITH',
+  'GREATER_THAN.ATTRIBUTE',
+  'EMAIL.YAHOO',
+  'EMAIL.GOOGLE'
+]
 ```
 
 
@@ -87,100 +97,72 @@ validator.add(anotherCustomValidation);
 
 ```javascript
 const validanode = require('validanode');
-
 const validator = new validanode;
-
-const { REQUIRED } = validator.TYPE_VALIDATOR;
 
 (async function () {
     let data = {
         // name: "Defri Indra Mahardika",
         age: 17,
     };
-
     let field = {
-        attribute: ['name', 'age'],
-        rules: [{
-            rule: REQUIRED,
+        'attribute': ['name', 'age'],
+        'rules': [{
+            'rule': 'required',
             'property.message': "Kolom '{attribute}' tidak boleh kosong."
         }, {
-            rule: "STRING",
+            'rule': "string",
             'property.message': "Kolom '{attribute}' harus berupa string."
         }],
     };
+    let err = await validator.check(field, data);
 
-    err = await validator.check(field, data);
-
-    if (err) {
-        console.log(err);
-    }
-
+    if (err) console.log(err);
 })();
-
-// OUTPUT :
-// {
-//     name: [
-//         "Kolom 'name' tidak boleh kosong.",
-//         "Kolom 'name' harus berupa string."
-//     ],
-//     age: ["Kolom 'age' harus berupa string."]
-// }
 ```
 
-### Get Type Validator Schema
+OUTPUT : 
+
+```javascript
+{
+  name: [
+    "Kolom 'name' tidak boleh kosong.",
+    "Kolom 'name' harus berupa string."
+  ],
+  age: [ "Kolom 'age' harus berupa string." ]
+}
+```
+
+### Get Validator Schema
 
 ```javascript
 const validanode = require('validanode');
-
 const validator = new validanode;
 
-const {
-    START_WITH
-} = validator.TYPE_VALIDATOR;
-
 (async function () {
-
-    equal_with_schema = validator.getTypeValidator('EQUAL_WITH');
-    console.log('EQUAL_WITH :')
-    console.log(equal_with_schema)
-
-    // Atau bisa juga dengan
-    
-    console.log('START_WITH :')
-    console.log(START_WITH)
-
+    let schema = validator.getValidator('EQUAL_WITH');
+    console.log(schema);
 })();
+```
 
-// OUTPUT :
-// 
-// EQUAL_WITH: {
-//     name: 'EQUAL_WITH',
-//     attribute: '',
-//     property: {
-//         targetAttribute: '',
-//         message: 'The {attribute} must equal with {property.targetAttribute}'
-//     },
-//     action: [Function: action]
-// }
-// START_WITH: {
-//     name: 'START_WITH',
-//     attribute: '',
-//     property: {
-//         value: '',
-//         message: 'The {attribute} must started with "{property.value}"'
-//     },
-//     action: [Function: action]
-// }
+OUTPUT : 
+
+```javascript
+{
+  name: 'EQUAL_WITH',
+  attribute: '',
+  property: {
+    targetAttribute: '',
+    message: 'The {attribute} must equal with {property.targetAttribute}'
+  },
+  action: [Function: action]
+}
 ```
 
 ### Add Custom Validator
 
 ```javascript
-const validanode = require('validanode');
-const {
-    invalidMessage
-} = require("./lib/core");
-
+const Validanode = require("validanode");
+const { invalidMessage } = require("validanode/lib/core");
 const CUSTOM_VALIDATION = {
     EMAIL: {
         YAHOO: {
@@ -198,33 +180,27 @@ const CUSTOM_VALIDATION = {
             }
         }
     }
-}
-
-const validator = new validanode;
-
+};
+const validator = new Validanode;
 validator.add(CUSTOM_VALIDATION);
 
 (async function () {
     let data = {
         email: 'example@gmail.com'
-    }
+    };
     let fields = {
         attribute: 'email',
         rules: 'EMAIL.YAHOO'
-    }
-
+    };
     let err = await validator.check(fields, data);
-
-    if(err){
-        console.log(err);
-    }
-
+    if (err) console.log(err);
 })();
+```
 
-// OUTPUT :
-// {
-//     email: ['The email should be a valid yahoo mail.']
-// }
+OUTPUT : 
+
+```javascript
+{ email: [ 'The email should be a valid yahoo mail.' ] }
 ```
 
 
@@ -232,51 +208,43 @@ validator.add(CUSTOM_VALIDATION);
 
 ```javascript
 const validanode = require('validanode');
-
 const MESSAGES = {
     'number': 'Kolom {attribute} harus berupa number!',
     'required': 'Kolom {attribute} tidak boleh kosong.',
     'greater_than.attribute': 'Kolom {attribute} harus lebih besar dari kolom {property.targetAttribute}',
 };
-
 const validator = new validanode;
-
-
 validator.localization(MESSAGES);
 
 (async function () {
     let data = {
         field_1: 12,
-        // field_2: 1,
     };
-
     let fields = [{
-        attribute: ['field_1', 'field_2'],
-        rules: ['required', 'number']
+        'attribute': ['field_1', 'field_2'],
+        'rules': ['required', 'number']
     }, {
-        attribute: 'field_1',
-        rules: {
-            rule: 'greater_than.attribute',
+        'attribute': 'field_1',
+        'rules': {
+            'rule': 'greater_than.attribute',
             'property.targetAttribute': 'field_2'
         }
-    }]
-
+    }];
     let err = await validator.check(fields, data);
-
-    if (err) {
-        console.log(err);
-    }
-
+    if (err) console.log(err);
 })();
+```
 
-// OUTPUT :
-// {
-//     field_2: [
-//         'Kolom field_2 tidak boleh kosong.',
-//         'Kolom field_2 harus berupa number!'
-//     ],
-//     field_1: ['Kolom field_1 harus lebih besar dari kolom field_2']
-// }
+OUTPUT : 
+
+```javascript
+{
+  field_2: [
+    'Kolom field_2 tidak boleh kosong.',
+    'Kolom field_2 harus berupa number!'
+  ],
+  field_1: [ 'Kolom field_1 harus lebih besar dari kolom field_2' ]
+}
 ```
 
 

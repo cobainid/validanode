@@ -1,13 +1,12 @@
 const {
     deleteElement,
-    dropSpecificArray,
     isArray,
     isObject,
     asArray,
     asObject,
 } = require("./lib/core");
 
-class validanode {
+class Validanode {
 
     TYPE_VALIDATOR = {};
 
@@ -21,7 +20,7 @@ class validanode {
         if (keys.length < 2) keys = keys[0];
 
         if (typeof keys === "string") {
-            rules = this.getTypeValidator(keys);
+            rules = this.getValidator(keys);
             if (rules === undefined) {
                 this.TYPE_VALIDATOR = Object.assign({}, this.TYPE_VALIDATOR, custom_validation);
             } else {
@@ -48,12 +47,12 @@ class validanode {
 
         return source;
     }
-    nestedGetValidator(key_list, data, resolve,  prefix = "") {
+    _getNestedValidator(key_list, data, resolve, prefix = "") {
         let value_key_list = Object.keys(data[1]);
         let key_name = "";
         if (prefix.length) {
             key_name = prefix + "." + data[0];
-        }else{
+        } else {
             key_name = data[0];
         }
 
@@ -62,7 +61,7 @@ class validanode {
 
         if (value_key_list.length > 0) {
             asArray(data[1]).forEach(nested_data => {
-                this.nestedGetValidator(key_list, nested_data, resolve, key_name);
+                this._getNestedValidator(key_list, nested_data, resolve, key_name);
             });
         } else {
             key_list.push(key_name);
@@ -70,17 +69,17 @@ class validanode {
         }
     }
 
-    getAllTypeValidator() {
+    getValidators() {
         return new Promise((resolve) => {
             let key_list = [];
 
             asArray(this.TYPE_VALIDATOR).forEach(data => {
-                this.nestedGetValidator(key_list, data, resolve, "");
+                this._getNestedValidator(key_list, data, resolve, "");
             });
         });
     }
 
-    getTypeValidator(type_name) {
+    getValidator(type_name) {
         try {
             type_name = type_name.toUpperCase().split('.');
 
@@ -104,15 +103,13 @@ class validanode {
             let key = msg[0];
             let newCustomMessage = msg[1];
 
-            let rule = this.getTypeValidator(key); // mendapatkan rule
+            let rule = this.getValidator(key); // mendapatkan rule
 
             rule.property.message = newCustomMessage;
 
-            if (rule.name !== undefined) {
-                rule = asObject([
-                    [rule.name, rule]
-                ]);
-            }
+            if (rule.name !== undefined) rule = asObject([
+                [rule.name, rule]
+            ]);
 
             this.TYPE_VALIDATOR = Object.assign({}, this.TYPE_VALIDATOR, rule);
         });
@@ -175,7 +172,8 @@ class validanode {
 
         for (let i = 0; i < rule_count; i++) {
             if (typeof rules[i] === "string") {
-                let temp_rule = this.getTypeValidator(rules[i]);
+                let temp_rule = this.getValidator(rules[i]);
+
                 if (temp_rule) {
                     rules[i] = temp_rule;
                 } else {
@@ -183,7 +181,8 @@ class validanode {
                 }
             }
             if (typeof rules[i].rule === "string") {
-                let temp_rule = this.getTypeValidator(rules[i].rule);
+                let temp_rule = this.getValidator(rules[i].rule);
+
                 if (temp_rule) {
                     rules[i].rule = temp_rule;
                 } else {
@@ -201,9 +200,7 @@ class validanode {
             let err = {};
 
             // check jika object tidak berupa array
-            if (isObject(fields)) {
-                fields = [fields];
-            }
+            if (isObject(fields)) fields = [fields];
 
             fields.forEach((field) => {
 
@@ -211,12 +208,8 @@ class validanode {
                 let rules = field.rules;
 
                 // mengubah type data menjadi array
-                if (!isArray(attributes)) {
-                    attributes = [attributes];
-                }
-                if (!isArray(rules)) {
-                    rules = [rules];
-                }
+                if (!isArray(attributes)) attributes = [attributes];
+                if (!isArray(rules)) rules = [rules];
 
                 rules = this.checkRule(rules); // exist or not
 
@@ -232,5 +225,4 @@ class validanode {
     }
 }
 
-
-module.exports = validanode
+module.exports = Validanode;
